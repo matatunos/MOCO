@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOCO - Gestor de Archivos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="logo">
+                <h1>📁 MOCO</h1>
+                <p>Tu gestor de archivos en la nube</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="login">Iniciar Sesión</button>
+                <button class="tab" data-tab="register">Registrarse</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label for="login-username">Usuario</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Contraseña</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form">
+                <div class="form-group">
+                    <label for="register-username">Usuario</label>
+                    <input type="text" id="register-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Contraseña</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password-confirm">Confirmar Contraseña</label>
+                    <input type="password" id="register-password-confirm" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+                <div id="register-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App Screen -->
+    <div id="app-screen" class="screen">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>📁 MOCO</h1>
+                <div class="breadcrumb">
+                    <span class="breadcrumb-item active">Mis Archivos</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <span class="user-info" id="user-name"></span>
+                <button class="btn btn-secondary" id="logout-btn">Cerrar Sesión</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav">
+                    <a href="#" class="nav-item active" data-view="my-files">
+                        <span class="icon">📂</span>
+                        <span>Mis Archivos</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="shared">
+                        <span class="icon">🔗</span>
+                        <span>Compartidos</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="recent">
+                        <span class="icon">🕐</span>
+                        <span>Recientes</span>
+                    </a>
+                    <a href="#" class="nav-item admin-only" data-view="admin" style="display: none;">
+                        <span class="icon">⚙️</span>
+                        <span>Administración</span>
+                    </a>
+                </nav>
+                
+                <div class="storage-info">
+                    <h3>Almacenamiento</h3>
+                    <div class="storage-bar">
+                        <div class="storage-used" style="width: 0%"></div>
+                    </div>
+                    <p><span id="storage-used">0 MB</span> usado</p>
+                </div>
+            </aside>
+
+            <!-- File Area -->
+            <main class="file-area">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn btn-primary" id="upload-btn">
+                            <span>⬆️</span> Subir Archivo
+                        </button>
+                        <button class="btn btn-secondary" id="new-folder-btn">
+                            <span>📁</span> Nueva Carpeta
+                        </button>
+                    </div>
+                    <div class="toolbar-right">
+                        <input type="text" class="search-input" placeholder="Buscar archivos..." id="search-input">
+                        <div class="view-toggle">
+                            <button class="view-btn active" data-view="grid">⊞</button>
+                            <button class="view-btn" data-view="list">☰</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="drop-zone">
+                    <div class="drop-zone-content">
+                        <p class="drop-zone-icon">📤</p>
+                        <p class="drop-zone-text">Arrastra archivos aquí o haz clic en "Subir Archivo"</p>
+                    </div>
+                </div>
+
+                <!-- Files Grid -->
+                <div class="files-container grid-view" id="files-container">
+                    <!-- Files will be loaded here dynamically -->
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-state-icon">📭</div>
+                    <h2>No hay archivos</h2>
+                    <p>Sube tu primer archivo o crea una carpeta</p>
+                </div>
+            </main>
+            
+            <!-- Admin Panel -->
+            <main class="admin-panel" id="admin-panel" style="display: none;">
+                <div class="admin-tabs">
+                    <button class="admin-tab active" data-tab="users">Usuarios</button>
+                    <button class="admin-tab" data-tab="settings">Configuración</button>
+                </div>
+                
+                <!-- Users Tab -->
+                <div class="admin-content" id="admin-users">
+                    <h2>Gestión de Usuarios</h2>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Fecha Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="admin-content" id="admin-settings" style="display: none;">
+                    <h2>Configuración del Sistema</h2>
+                    <div class="settings-form">
+                        <div class="setting-item">
+                            <label>
+                                <input type="checkbox" id="setting-registration">
+                                Permitir registro de nuevos usuarios
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label>
+                                Tamaño máximo de archivo (MB)
+                                <input type="number" id="setting-max-size" value="100" min="1" max="1024">
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" id="save-settings-btn">Guardar Configuración</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Folder Modal -->
+    <div class="modal" id="new-folder-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nueva Carpeta</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="folder-name">Nombre de la carpeta</label>
+                    <input type="text" id="folder-name" placeholder="Mi Carpeta">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancelar</button>
+                <button class="btn btn-primary" id="create-folder-btn">Crear</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Folder Modal -->
+    <div class="modal" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Compartir Carpeta</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="share-username">Usuario</label>
+                    <input type="text" id="share-username" placeholder="nombre_usuario">
+                </div>
+                <div class="form-group">
+                    <label for="share-permission">Permiso</label>
+                    <select id="share-permission">
+                        <option value="read">Solo lectura</option>
+                        <option value="write">Lectura y escritura</option>
+                    </select>
+                </div>
+                <div id="current-shares">
+                    <h3>Compartido con:</h3>
+                    <div id="shares-list"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cerrar</button>
+                <button class="btn btn-primary" id="share-folder-btn">Compartir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <button class="context-item" data-action="download">⬇️ Descargar</button>
+        <button class="context-item" data-action="share">🔗 Compartir</button>
+        <button class="context-item" data-action="rename">✏️ Renombrar</button>
+        <button class="context-item" data-action="delete">🗑️ Eliminar</button>
+    </div>
+
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" style="display: none;" multiple>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
